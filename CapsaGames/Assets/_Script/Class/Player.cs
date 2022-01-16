@@ -19,7 +19,7 @@ public class Player
         this.playerCardPlace = playerCardPlace;
     }
 
-    public Card[] GetCards()
+    public List<Card> GetCards()
     {
         return cardsOnHand.cards;
     }

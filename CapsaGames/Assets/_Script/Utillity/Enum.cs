@@ -14,11 +14,16 @@ namespace Enum
 
     public enum CardSet
     {
+        Error,
         HighNumber,
-        Double,
+        Pair,
+        TwoPair,
+        ThreeOfKind,
         Straight,
-        FullHouse,
         Flush,
-        RoyalFlush
+        FullHouse,
+        FourOfKind,
+        StraightFlush,
+        RoyalStraightFlush,
     }
 }

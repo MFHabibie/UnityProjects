@@ -5,11 +5,11 @@ using Enum;
 
 public class DeckHandler : MonoBehaviour
 {
-    public Dictionary<string, Queue<GameObject>> deck;
+    public Dictionary<string, GameObject> deck;
+    private List<string> cardKeysUsable;
 
-    AssetHandler assetHandler;
+    private AssetHandler assetHandler;
 
-    List<string> cardKeysUsable;
 
     private void Start()
     {
@@ -20,7 +20,7 @@ public class DeckHandler : MonoBehaviour
 
     void SetupCard()
     {
-        deck = new Dictionary<string, Queue<GameObject>>();
+        deck = new Dictionary<string, GameObject>();
 
         cardKeysUsable = new List<string>();
 
@@ -30,16 +30,16 @@ public class DeckHandler : MonoBehaviour
         {
             for (int j = 0; j < cardTypeLength; j++)
             {
-                Queue<GameObject> deckCard = new Queue<GameObject>();
+                //Queue<GameObject> deckCard = new Queue<GameObject>();
 
                 string key = (i + 2).ToString() + ((CardType)j).ToString();
 
                 GameObject card = Instantiate(assetHandler.prefabCard, new Vector3(0f, 0f, 0f), Quaternion.identity);
                 card.GetComponent<CardObject>().SetupCard(key, i + 2, j);
                 card.SetActive(false);
-                deckCard.Enqueue(card);
+                //deckCard.Enqueue(card);
 
-                deck.Add(key, deckCard);
+                deck.Add(key, card);
                 cardKeysUsable.Add(key);
             }
         }
@@ -50,7 +50,7 @@ public class DeckHandler : MonoBehaviour
         string key = cardKeysUsable[Random.Range(0, cardKeysUsable.Count)];
 
         cardKeysUsable.Remove(key);
-        GameObject cardToGive = deck[key].Dequeue();
+        GameObject cardToGive = deck[key];
         cardToGive.SetActive(true);
         cardToGive.transform.position = cardPosition;
         cardToGive.transform.rotation = cardRotation;
@@ -58,11 +58,16 @@ public class DeckHandler : MonoBehaviour
         return cardToGive.GetComponent<CardObject>().card;
     }
 
+    public Card GetCardFromKey(string key)
+    {
+        return deck[key].GetComponent<CardObject>().card;
+    }
+
     public void ReturnCard(string key)
     {
-        GameObject objToReturn = deck[key].Peek();
+        GameObject objToReturn = deck[key];
         objToReturn.SetActive(false);
-        deck[key].Enqueue(objToReturn);
+        //deck[key].Enqueue(objToReturn);
         cardKeysUsable.Add(key);
     }
 }

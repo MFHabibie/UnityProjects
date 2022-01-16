@@ -7,10 +7,10 @@ public class Cards
 {
     public int rowOneSum = 3;
     public int rowTwoThreeSum = 4;
-    public Card[] cards;
+    public List<Card> cards;
     public List<CardSet> cardSets;
 
-    public Cards(Card[] deck)
+    public Cards(List<Card> deck)
     {
         cards = deck;
     }

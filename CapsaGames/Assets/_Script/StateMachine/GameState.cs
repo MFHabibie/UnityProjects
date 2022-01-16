@@ -80,16 +80,16 @@ public class GameState : MonoBehaviour
         {
             if (allPlayer[i].GetComponent<LocalPlayer>())
             {
-                Card[] cards = allPlayer[i].GetComponent<LocalPlayer>().player.GetCards();
-                for (int ind = 0; ind < cards.Length; ind++)
+                List<Card> cards = allPlayer[i].GetComponent<LocalPlayer>().player.GetCards();
+                for (int ind = 0; ind < cards.Count; ind++)
                 {
                     deckHandler.ReturnCard(cards[i].keyForCard);
                 }
             }
             else
             {
-                Card[] cards = allPlayer[i].GetComponent<AIPlayer>().player.GetCards();
-                for (int ind = 0; ind < cards.Length; ind++)
+                List<Card> cards = allPlayer[i].GetComponent<AIPlayer>().player.GetCards();
+                for (int ind = 0; ind < cards.Count; ind++)
                 {
                     deckHandler.ReturnCard(cards[i].keyForCard);
                 }

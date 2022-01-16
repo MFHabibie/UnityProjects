@@ -9,6 +9,7 @@ public class Card
     public int cardNumber;
     public CardType cardType;
 
+
     public Card(string key, int number, CardType type)
     {
         keyForCard = key;
