@@ -10,16 +10,11 @@ public class CardSetHandler : MonoBehaviour
     public Dictionary<string, List<string>> setForFour;
     public Dictionary<string, List<string>> setForSpecial;
 
-
-    private void Start()
-    {
-        
-    }
-
     public KeyValuePair<Card, CardSet> CheckFirstLineCard(List<Card> firstLine)
     {
         int sameCard = 0;
-        Card highCard = new Card();
+        Card highCard = null;
+        Card pairCard = null;
         Dictionary<int, int> countCard = new Dictionary<int, int>();
         KeyValuePair<Card, CardSet> cardSet = new KeyValuePair<Card, CardSet>();
 
@@ -34,34 +29,31 @@ public class CardSetHandler : MonoBehaviour
                 int counting = 0;
                 countCard.TryGetValue(card.cardNumber, out counting);
                 countCard.Remove(card.cardNumber);
-                countCard.Add(card.cardNumber, counting++);
+                counting++;
+                countCard.Add(card.cardNumber, counting);
 
-                if (counting == 2)
+                if (counting == 2 || counting == 3)
                 {
-                    cardSet = new KeyValuePair<Card, CardSet>(card, CardSet.Pair);
-                }
-                else if (counting == 3)
-                {
-                    cardSet = new KeyValuePair<Card, CardSet>(card, CardSet.Error);
+                    pairCard = card;
+                    sameCard = counting;
                 }
             }
 
-            if (highCard.cardNumber < card.cardNumber)
+            if (highCard == null)
                 highCard = card;
-        }
-
-        foreach (KeyValuePair<int, int> entry in countCard)
-        {
-            if (entry.Value == 2)
+            else
             {
-                sameCard = entry.Value;
-                break;
+                if (highCard.cardNumber < card.cardNumber)
+                    highCard = card;
             }
         }
 
-        if (sameCard == 0)
+        if (sameCard == 2)
+            cardSet = new KeyValuePair<Card, CardSet>(pairCard, CardSet.Pair);
+        else if (sameCard == 3)
+            cardSet = new KeyValuePair<Card, CardSet>(pairCard, CardSet.ThreeOfKind);
+        else
             cardSet = new KeyValuePair<Card, CardSet>(highCard, CardSet.HighNumber);
-
 
         return cardSet;
     }
@@ -72,12 +64,14 @@ public class CardSetHandler : MonoBehaviour
         int countStraight = 0;
         List<int> straightNumb = new List<int>();
 
+        int countTwoPair = 0;
         int countFlush = 0;
+        Card highCard = null;
         Card twoKindCard = null;
         Card twoPairCard = null;
         Card threeKindCard = null;
+        Card fourKindCard = null;
         Card flushCard = null;
-        Card highCard = null;
         CardSet temporarySet = CardSet.Error;
         Dictionary<int, int> countCard = new Dictionary<int, int>();
         KeyValuePair<Card, CardSet> cardSet = new KeyValuePair<Card, CardSet>();
@@ -95,15 +89,24 @@ public class CardSetHandler : MonoBehaviour
                 int counting = 0;
                 countCard.TryGetValue(card.cardNumber, out counting);
                 countCard.Remove(card.cardNumber);
-                countCard.Add(card.cardNumber, counting++);
+                counting++;
+                countCard.Add(card.cardNumber, counting);
 
                 if (counting == 2)
                 {
                     twoKindCard = card;
 
-                    if (twoKindCard != card)
+                    if (countTwoPair == 0)
                     {
+                        twoPairCard = card;
+                        countTwoPair++;
+                    }
+                    else
+                    {
+                        if (twoPairCard.cardNumber > card.cardNumber)
+                            twoPairCard = card;
 
+                        countTwoPair++;
                     }
                 }
                 else if (counting == 3)
@@ -114,15 +117,20 @@ public class CardSetHandler : MonoBehaviour
                 else if (counting == 4)
                 {
                     threeKindCard = null;
+                    fourKindCard = card;
                     temporarySet = CardSet.FourOfKind;
-                    cardSet = new KeyValuePair<Card, CardSet>(card, CardSet.FourOfKind);
                 }
             }
 
-            if (highCard.cardNumber < card.cardNumber)
+            if (highCard == null)
                 highCard = card;
+            else
+            {
+                if (highCard.cardNumber < card.cardNumber)
+                    highCard = card;
+            }
 
-            if(countFlush == 0)
+            if (countFlush == 0)
             {
                 flushCard = card;
                 countFlush++;
@@ -149,53 +157,44 @@ public class CardSetHandler : MonoBehaviour
         if (countFlush == 5)
         {
             if (countStraight == 4)
-            {
-                cardSet = new KeyValuePair<Card, CardSet>(highCard, CardSet.StraightFlush);
-            }
+                temporarySet = CardSet.StraightFlush;
             else
-            {
-                cardSet = new KeyValuePair<Card, CardSet>(highCard, CardSet.Flush);
-            }
+                temporarySet = CardSet.Flush;
         }
         else
         {
             foreach (KeyValuePair<int, int> entry in countCard)
             {
-                if (entry.Value == 2 && threeKindCard == null)
+                if (entry.Value == 2)
                 {
-                    temporarySet = CardSet.Pair;
-                }
-                else if (entry.Value == 2 && temporarySet == CardSet.Pair)
-                {
-                    temporarySet = CardSet.TwoPair;
-                }
-                else if (entry.Value == 2 && threeKindCard != null)
-                {
-                    temporarySet = CardSet.FullHouse;
+                    if (threeKindCard == null)
+                    {
+                        temporarySet = CardSet.Pair;
+                        if (temporarySet == CardSet.Pair && countTwoPair == 2)
+                            temporarySet = CardSet.TwoPair;
+                    }
+                    else
+                        temporarySet = CardSet.FullHouse;
                 }
                 else if (entry.Value == 3 && temporarySet == CardSet.Error)
                 {
                     temporarySet = CardSet.ThreeOfKind;
                 }
             }
-
-            if (temporarySet == CardSet.Error)
-            {
-                cardSet = new KeyValuePair<Card, CardSet>(highCard, CardSet.HighNumber);
-            }
-            else if (temporarySet == CardSet.ThreeOfKind || temporarySet == CardSet.FullHouse)
-            {
-                cardSet = new KeyValuePair<Card, CardSet>(threeKindCard, temporarySet);
-            }
-            else if (temporarySet == CardSet.Pair)
-            {
-                cardSet = new KeyValuePair<Card, CardSet>(twoKindCard, temporarySet);
-            }
-            else if (temporarySet == CardSet.TwoPair)
-            {
-                cardSet = new KeyValuePair<Card, CardSet>(twoPairCard, temporarySet);
-            }
         }
+
+        if (temporarySet == CardSet.Flush || temporarySet == CardSet.StraightFlush)
+            cardSet = new KeyValuePair<Card, CardSet>(highCard, temporarySet);
+        else if (temporarySet == CardSet.ThreeOfKind || temporarySet == CardSet.FullHouse)
+            cardSet = new KeyValuePair<Card, CardSet>(threeKindCard, temporarySet);
+        else if (temporarySet == CardSet.Pair)
+            cardSet = new KeyValuePair<Card, CardSet>(twoKindCard, temporarySet);
+        else if (temporarySet == CardSet.TwoPair)
+            cardSet = new KeyValuePair<Card, CardSet>(twoPairCard, temporarySet);
+        else if (temporarySet == CardSet.FourOfKind)
+            cardSet = new KeyValuePair<Card, CardSet>(fourKindCard, CardSet.FourOfKind);
+        else
+            cardSet = new KeyValuePair<Card, CardSet>(highCard, CardSet.HighNumber);
 
         return cardSet;
     }

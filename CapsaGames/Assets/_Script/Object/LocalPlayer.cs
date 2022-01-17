@@ -10,10 +10,15 @@ public class LocalPlayer : MonoBehaviour
     public Avatar avatarPlayer;
     public Sprite avatarImage;
     public Transform cardPlace;
+    public int winEachLine;
+
+    KeyValuePair<Card, int> scoreFirstLine;
+    KeyValuePair<Card, int> scoreSecondLine;
+    KeyValuePair<Card, int> scoreThirdLine;
 
     void Start()
     {
-        AssetHandler asset = AssetHandler.instance;
+        AssetHandler asset = GameManager.Instance.assetHandler;
         avatarImage = GetComponent<SpriteRenderer>().sprite;
 
         player = new Player("LocalPlayer", transform, cardPlace);
@@ -34,5 +39,25 @@ public class LocalPlayer : MonoBehaviour
     public void Angry()
     {
         avatarImage = avatarPlayer.Angry();
+    }
+    
+    public void SetupScore(KeyValuePair<Card, int> firstLine, KeyValuePair<Card, int> secondLine, KeyValuePair<Card, int> thirdLine)
+    {
+        scoreFirstLine = firstLine;
+        scoreSecondLine = secondLine;
+        scoreThirdLine = thirdLine;
+    }
+
+    public KeyValuePair<Card, int> GetFirstLineScore()
+    {
+        return scoreFirstLine;
+    }
+    public KeyValuePair<Card, int> GetSecondLineScore()
+    {
+        return scoreSecondLine;
+    }
+    public KeyValuePair<Card, int> GetThirdLineScore()
+    {
+        return scoreThirdLine;
     }
 }

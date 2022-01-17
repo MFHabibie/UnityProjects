@@ -7,11 +7,17 @@ public class GameState : MonoBehaviour
 {
     public static GameState instance;
 
-    public DeckHandler deckHandler;
-
     public List<Card> cards;
 
-    GameObject[] allPlayer;
+    private DeckHandler deckHandler;
+    private GameObject[] allPlayer;
+
+    private int firstLineScore;
+    private int secondLineScore;
+    private int thirdLineScore;
+    private int highestScore;
+
+    private GameObject winner;
 
     private void Awake()
     {
@@ -34,7 +40,7 @@ public class GameState : MonoBehaviour
             allPlayer[i] = playerObject[i];
         }
 
-        deckHandler = FindObjectOfType<DeckHandler>();
+        deckHandler = GameManager.Instance.deckHandler;
     }
 
     void DrawCard()
@@ -57,24 +63,120 @@ public class GameState : MonoBehaviour
                     yield return null;
             }
         }
+
+        yield return new WaitForSeconds(1.5f);
+        SetupCardHandler.instance.StartSetup();
     }
 
-    //function for take back card from player hand
-    void ResetCard()
+    public void CalculateResult()
     {
+        for (int i = 0; i < allPlayer.Length; i++)
+        {
+            if (allPlayer[i].GetComponent<AIPlayer>())
+            {
+                allPlayer[i].GetComponent<AIPlayer>().SetupScore();
+            }
+        }
 
-    }
+        for (int i = 0; i < allPlayer.Length; i++)
+        {
+            if (allPlayer[i].GetComponent<LocalPlayer>())
+            {
+                if (firstLineScore < allPlayer[i].GetComponent<LocalPlayer>().GetFirstLineScore().Value)
+                {
+                    firstLineScore = allPlayer[i].GetComponent<LocalPlayer>().GetFirstLineScore().Value;
+                    allPlayer[i].GetComponent<LocalPlayer>().winEachLine++;
+                }
 
-    void CalculateResult()
-    {
+                if (secondLineScore < allPlayer[i].GetComponent<LocalPlayer>().GetSecondLineScore().Value)
+                {
+                    secondLineScore = allPlayer[i].GetComponent<LocalPlayer>().GetSecondLineScore().Value;
+                    allPlayer[i].GetComponent<LocalPlayer>().winEachLine++;
+                }
+
+                if (thirdLineScore < allPlayer[i].GetComponent<LocalPlayer>().GetThirdLineScore().Value)
+                {
+                    thirdLineScore = allPlayer[i].GetComponent<LocalPlayer>().GetThirdLineScore().Value;
+                    allPlayer[i].GetComponent<LocalPlayer>().winEachLine++;
+                }
+            }
+            else
+            {
+                if (firstLineScore < allPlayer[i].GetComponent<AIPlayer>().GetFirstLineScore().Value)
+                {
+                    firstLineScore = allPlayer[i].GetComponent<AIPlayer>().GetFirstLineScore().Value;
+                    allPlayer[i].GetComponent<AIPlayer>().winEachLine++;
+                }
+
+                if (secondLineScore < allPlayer[i].GetComponent<AIPlayer>().GetSecondLineScore().Value)
+                {
+                    secondLineScore = allPlayer[i].GetComponent<AIPlayer>().GetSecondLineScore().Value;
+                    allPlayer[i].GetComponent<AIPlayer>().winEachLine++;
+                }
+
+                if (thirdLineScore < allPlayer[i].GetComponent<AIPlayer>().GetThirdLineScore().Value)
+                {
+                    thirdLineScore = allPlayer[i].GetComponent<AIPlayer>().GetThirdLineScore().Value;
+                    allPlayer[i].GetComponent<AIPlayer>().winEachLine++;
+                }
+            }
+        }
+
+        for (int i = 0; i < allPlayer.Length; i++)
+        {
+            if (allPlayer[i].GetComponent<LocalPlayer>())
+            {
+                if (highestScore < allPlayer[i].GetComponent<LocalPlayer>().winEachLine)
+                {
+                    highestScore = allPlayer[i].GetComponent<LocalPlayer>().winEachLine;
+                    winner = allPlayer[i];
+                }
+            }
+            else
+            {
+                if (highestScore < allPlayer[i].GetComponent<AIPlayer>().winEachLine)
+                {
+                    highestScore = allPlayer[i].GetComponent<AIPlayer>().winEachLine;
+                    winner = allPlayer[i];
+                }
+            }
+        }
+
+        for (int i = 0; i < allPlayer.Length; i++)
+        {
+            if (winner == allPlayer[i])
+            {
+                if (winner.GetComponent<LocalPlayer>())
+                {
+                    winner.GetComponent<LocalPlayer>().Happy();
+                }
+                else
+                {
+                    winner.GetComponent<AIPlayer>().Happy();
+                }
+            }
+            else
+            {
+                if (allPlayer[i].GetComponent<LocalPlayer>())
+                {
+                    allPlayer[i].GetComponent<LocalPlayer>().Angry();
+                }
+                else
+                {
+                    allPlayer[i].GetComponent<AIPlayer>().Angry();
+                }
+            }
+        }
+
+        
+
+
         StartCoroutine("ReturningCard");
     }
 
     IEnumerator ReturningCard()
     {
-
-
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(3f);
 
         for (int i = 0; i < allPlayer.Length; i++)
         {
@@ -85,6 +187,8 @@ public class GameState : MonoBehaviour
                 {
                     deckHandler.ReturnCard(cards[i].keyForCard);
                 }
+
+                allPlayer[i].GetComponent<LocalPlayer>().Default();
             }
             else
             {
@@ -93,6 +197,8 @@ public class GameState : MonoBehaviour
                 {
                     deckHandler.ReturnCard(cards[i].keyForCard);
                 }
+
+                allPlayer[i].GetComponent<AIPlayer>().Default();
             }
         }
     }

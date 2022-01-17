@@ -5,8 +5,6 @@ using Enum;
 
 public class Cards
 {
-    public int rowOneSum = 3;
-    public int rowTwoThreeSum = 4;
     public List<Card> cards;
     public List<CardSet> cardSets;
 
@@ -15,17 +13,17 @@ public class Cards
         cards = deck;
     }
 
-    int ValueRowOne()
+    public int ValueRowOne()
     {
         return 0;
     }
 
-    int ValueRowTwo()
+    public int ValueRowTwo()
     {
         return 0;
     }
 
-    int ValueRowThree()
+    public int ValueRowThree()
     {
         return 0;
     }

@@ -26,4 +26,11 @@ namespace Enum
         StraightFlush,
         RoyalStraightFlush,
     }
+
+    public enum CardSetup
+    {
+        FirstLine,
+        SecondLine,
+        ThirdLine
+    }
 }

@@ -28,14 +28,11 @@ public class PlayerState
     {
         Debug.Log("Draw!");
         List<Card> dummyCard = new List<Card>();
-        player.keyForCards = new string[11];
+        player.keyForCards = new string[13];
 
         for (int i = 0; i < player.keyForCards.Length; i++)
         {
-            while (dummyCard[i] == null)
-            {
-                dummyCard.Add(GameState.instance.deckHandler.TakeRandomCard(player.playerCardPlace.position, player.playerCardPlace.rotation));
-            }
+            dummyCard.Add(GameManager.Instance.deckHandler.TakeRandomCard(player.playerCardPlace.position, player.playerCardPlace.rotation));
             player.keyForCards[i] = dummyCard[i].keyForCard;
         }
 

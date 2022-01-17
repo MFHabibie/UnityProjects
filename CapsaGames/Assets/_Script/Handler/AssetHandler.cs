@@ -5,7 +5,6 @@ using Enum;
 
 public class AssetHandler : MonoBehaviour
 {
-    public static AssetHandler instance;
     public Sprite[] cardImageDiamond;
     public Sprite[] cardImageClover;
     public Sprite[] cardImageHeart;
@@ -14,11 +13,6 @@ public class AssetHandler : MonoBehaviour
     public Sprite[] avatarExpression;
 
     public GameObject prefabCard;
-
-    private void Awake()
-    {
-        instance = this;
-    }
 
     public Sprite GetCardSprite(int index, CardType type)
     {

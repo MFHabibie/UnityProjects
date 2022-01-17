@@ -13,7 +13,7 @@ public class DeckHandler : MonoBehaviour
 
     private void Start()
     {
-        assetHandler = AssetHandler.instance;
+        assetHandler = GameManager.Instance.assetHandler;
 
         SetupCard();
     }
@@ -30,14 +30,12 @@ public class DeckHandler : MonoBehaviour
         {
             for (int j = 0; j < cardTypeLength; j++)
             {
-                //Queue<GameObject> deckCard = new Queue<GameObject>();
 
                 string key = (i + 2).ToString() + ((CardType)j).ToString();
 
                 GameObject card = Instantiate(assetHandler.prefabCard, new Vector3(0f, 0f, 0f), Quaternion.identity);
                 card.GetComponent<CardObject>().SetupCard(key, i + 2, j);
                 card.SetActive(false);
-                //deckCard.Enqueue(card);
 
                 deck.Add(key, card);
                 cardKeysUsable.Add(key);
@@ -58,16 +56,16 @@ public class DeckHandler : MonoBehaviour
         return cardToGive.GetComponent<CardObject>().card;
     }
 
-    public Card GetCardFromKey(string key)
+    public CardObject GetCardFromKey(string key)
     {
-        return deck[key].GetComponent<CardObject>().card;
+        return deck[key].GetComponent<CardObject>();
     }
 
     public void ReturnCard(string key)
     {
         GameObject objToReturn = deck[key];
+        objToReturn.GetComponent<CardObject>().CloseCard();
         objToReturn.SetActive(false);
-        //deck[key].Enqueue(objToReturn);
         cardKeysUsable.Add(key);
     }
 }
